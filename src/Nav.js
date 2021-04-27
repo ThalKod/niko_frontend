@@ -8,7 +8,7 @@ const Nav = ({ account }) => {
             href="/"
         >
           <img src={"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Ethereum-icon-purple.svg/1200px-Ethereum-icon-purple.svg.png"} width="30" height="30" className="d-inline-block align-top" alt="" />
-          &nbsp; Niko Dapp
+          &nbsp; Niko
         </a>
 
         <ul className="navbar-nav px-3">
