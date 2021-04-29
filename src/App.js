@@ -46,7 +46,7 @@ function App() {
 
   const LoadingSpinner = () => {
     return (
-        <div className="spinner-border" role="status" />
+        <p id="loader" className="text-center">Loading...</p>
     )
   };
 

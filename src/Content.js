@@ -6,8 +6,12 @@ import StakingRewards from "./contracts/StakingRewards";
 const Content = ({ account }) => {
   const [nikoContract, setNikoContract] = useState();
   const [stakingRewardsContract, setStakingRewardsContract] = useState();
+  const [stakingAddress, setStakingAddress] = useState();
   const [walletBalance, setWalletbalance] = useState(0);
   const [stakingBalance, setStakingbalance] = useState(0);
+  const [loadingStake, setLoadingStake] =useState(false);
+  const [loadingUnstake, setLoadingUnstake] =useState(false);
+  const [input, setInput] = useState(0);
 
   useEffect(() => {
     loadData();
@@ -30,11 +34,32 @@ const Content = ({ account }) => {
     const walletBalance = await nikoContract.methods.balanceOf(account).call();
     setWalletbalance(walletBalance);
 
+    setStakingAddress(stakingData.address);
     const stakingContract = new web3.eth.Contract(StakingRewards.abi, stakingData.address);
     setStakingRewardsContract(stakingContract);
     const stakingBalance = await stakingContract.methods.getStakes(account).call();
     setStakingbalance(stakingBalance);
+
   };
+
+   const stakeToken = async () => {
+     setLoadingStake(true);
+     console.log("Stake !", input);
+     const amountToStake = window.web3.utils.toWei(input, 'Ether');
+     console.log("Address", stakingAddress);
+     const approve = await nikoContract.methods.approve(stakingAddress, amountToStake).send({ from: account});
+     console.log("approve", approve);
+     const stake = await stakingRewardsContract.methods.createStake(amountToStake).send({from: account});
+     console.log("stake", stake);
+     setLoadingStake(false);
+   };
+
+   const unstakeToken =  async () => {
+     setLoadingUnstake(true);
+     const unstake = await stakingRewardsContract.methods.removeStake(stakingBalance).send({from: account});
+     console.log("unstake", unstake);
+     setLoadingUnstake(false);
+   };
 
   return (
       <div id="content" className="mt-3">
@@ -59,7 +84,8 @@ const Content = ({ account }) => {
           <div className="card-body">
 
             <form className="mb-3" onSubmit={(event) => {
-              event.preventDefault()
+              event.preventDefault();
+              stakeToken(event);
             }}>
               <div>
                 <label className="float-left"><b>Stake Tokens</b></label>
@@ -69,9 +95,10 @@ const Content = ({ account }) => {
               </div>
               <div className="input-group mb-4">
                 <input
-                    type="text"
+                    type="number"
                     className="form-control form-control-lg"
-                    placeholder="0"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
                     required />
                 <div className="input-group-append">
                   <div className="input-group-text">
@@ -80,15 +107,19 @@ const Content = ({ account }) => {
                   </div>
                 </div>
               </div>
-              <button type="submit" className="btn btn-primary btn-block btn-lg">STAKE!</button>
+              <button disabled={loadingStake} type="submit" className="btn btn-primary btn-block btn-lg">
+                {loadingStake? <div className="spinner-border text-center" role="status" /> : "STAKE" }
+              </button>
             </form>
             <button
+                disabled={loadingUnstake}
                 type="submit"
                 className="btn btn-link btn-block btn-sm"
                 onClick={(event) => {
-                  event.preventDefault()
+                  event.preventDefault();
+                  unstakeToken();
                 }}>
-              UN-STAKE...
+              {loadingUnstake? <div className="spinner-border text-center" role="status" /> : "UN-STAKE" }
             </button>
           </div>
         </div>
