@@ -9,8 +9,10 @@ const Content = ({ account }) => {
   const [stakingAddress, setStakingAddress] = useState();
   const [walletBalance, setWalletbalance] = useState(0);
   const [stakingBalance, setStakingbalance] = useState(0);
+  const [rewardsBAlance, setRewardsBalance] = useState(0);
   const [loadingStake, setLoadingStake] =useState(false);
   const [loadingUnstake, setLoadingUnstake] =useState(false);
+  const [loadingClaim, setLoadingClaim] =useState(false);
   const [input, setInput] = useState(0);
 
   useEffect(() => {
@@ -40,6 +42,8 @@ const Content = ({ account }) => {
     const stakingBalance = await stakingContract.methods.getStakes(account).call();
     setStakingbalance(stakingBalance);
 
+    const rewardsBalance = await stakingContract.methods.getRewards(account).call();
+    setRewardsBalance(rewardsBalance);
   };
 
    const stakeToken = async () => {
@@ -61,6 +65,13 @@ const Content = ({ account }) => {
      setLoadingUnstake(false);
    };
 
+  const claimRewards = async () => {
+    setLoadingClaim(true);
+    const claim = await stakingRewardsContract.methods.claimRewards().send({from: account});
+    console.log("claim", claim);
+    setLoadingClaim(false);
+  };
+
   return (
       <div id="content" className="mt-3">
 
@@ -74,7 +85,7 @@ const Content = ({ account }) => {
           <tbody>
           <tr>
             <td>{convertToEther(stakingBalance)} NKO</td>
-            <td>0 NKO</td>
+            <td>{convertToEther(rewardsBAlance)} NKO</td>
           </tr>
           </tbody>
         </table>
@@ -120,6 +131,16 @@ const Content = ({ account }) => {
                   unstakeToken();
                 }}>
               {loadingUnstake? <div className="spinner-border text-center" role="status" /> : "UN-STAKE" }
+            </button>
+            <button
+                disabled={loadingClaim}
+                type="submit"
+                className="btn btn-link btn-block btn-sm"
+                onClick={(event) => {
+                  event.preventDefault();
+                  claimRewards();
+                }}>
+              {loadingClaim? <div className="spinner-border text-center" role="status" /> : "CLAIM REWARDS" }
             </button>
           </div>
         </div>
