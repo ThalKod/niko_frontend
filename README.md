@@ -7,6 +7,9 @@
     Basic front end to interact with the Niko Smart Contracts on Ropsten
     <br />
   </p>
+  
+  ![screenshot](https://github.com/ThalKod/niko_frontend/blob/master/niko_front_end.png)
+
 </p>
 
 <!-- ABOUT THE PROJECT -->
